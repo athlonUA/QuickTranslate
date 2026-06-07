@@ -1,0 +1,75 @@
+name: QuickTranslate
+
+options:
+  minimumXcodeGenVersion: "2.0.0"
+  bundleIdPrefix: com.alexgarmatenko
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    DEAD_CODE_STRIPPING: YES
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    SWIFT_TREAT_WARNINGS_AS_ERRORS: NO
+    GCC_TREAT_WARNINGS_AS_ERRORS: NO
+    CLANG_ENABLE_MODULES: YES
+    COMBINE_HIDPI_IMAGES: YES
+    CODE_SIGN_STYLE: Automatic
+    CODE_SIGN_IDENTITY: "-"
+    DEVELOPMENT_TEAM: ""
+    ENABLE_HARDENED_RUNTIME: YES
+    GENERATE_INFOPLIST_FILE: NO
+    SWIFT_EMIT_LOC_STRINGS: YES
+
+targets:
+  QuickTranslate:
+    type: application
+    platform: macOS
+    sources:
+      - path: QuickTranslate
+        excludes:
+          - "Info.plist"
+          - "QuickTranslate.entitlements"
+    info:
+      path: QuickTranslate/Info.plist
+      properties:
+        CFBundleName: $(PRODUCT_NAME)
+        CFBundleDisplayName: Quick Translate
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+        CFBundleExecutable: $(EXECUTABLE_NAME)
+        CFBundlePackageType: APPL
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+        CFBundleInfoDictionaryVersion: "6.0"
+        LSUIElement: true
+        LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
+        NSHumanReadableCopyright: "© 2026 Alex Garmatenko. MIT-licensed."
+        NSPrincipalClass: NSApplication
+    entitlements:
+      path: QuickTranslate/QuickTranslate.entitlements
+      properties:
+        com.apple.security.app-sandbox: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.alexgarmatenko.QuickTranslate
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_PREVIEWS: YES
+
+  QuickTranslateTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: QuickTranslateTests
+    dependencies:
+      - target: QuickTranslate
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.alexgarmatenko.QuickTranslateTests
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/QuickTranslate.app/Contents/MacOS/QuickTranslate"
+        GENERATE_INFOPLIST_FILE: YES
