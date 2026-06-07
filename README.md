@@ -5,8 +5,9 @@
 A lightweight menu-bar-only macOS app that translates **selected text or
 clipboard contents** with a single global hotkey via the
 [DeepL API](https://www.deepl.com/docs-api). The translated result appears in
-a small floating panel above your current window — press **Esc** to dismiss
-and keep working.
+a floating panel above your current window — press **Esc** to dismiss and
+keep working. The panel is resizable and remembers your last size between
+translations.
 
 - **One-tap translation.** Hotkey → DeepL → floating result. No window
   switching, no tab juggling.
@@ -56,8 +57,8 @@ Run it with `open` and look for the **⌘** icon in your menu bar.
    target language (default `EN-US`).
 3. Anywhere on your Mac, either select some text **or** copy it to the
    clipboard, then press the global hotkey (default `⌃⌥⌘T`).
-4. A small floating panel pops up with the translation. **Esc** or the close
-   button dismisses it.
+4. A floating panel pops up with the translation (default 720×360, drag the
+   corner to resize). **Esc** or the close button dismisses it.
 
 The popover also offers:
 
@@ -143,7 +144,9 @@ QuickTranslateApp                 // @main, MenuBarExtra(.window)
 - **API key** is persisted in the login Keychain via
   `KeychainAPIKeyStore` (production) / `InMemoryAPIKeyStore` (tests).
 - **Translation overlay** is a floating `NSPanel` at `.floating` level with
-  the standard window chrome — auto-adapts to system light/dark mode.
+  the standard window chrome — auto-adapts to system light/dark mode, opens
+  at 720×360, and is freely resizable (the new size persists across
+  subsequent translations in the same run).
 
 ## Development
 

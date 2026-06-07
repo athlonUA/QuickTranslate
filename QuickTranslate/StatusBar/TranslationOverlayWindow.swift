@@ -39,6 +39,14 @@ final class TranslationOverlayWindow {
 
     private func show() {
         ensurePanel()
+        // Recover from a stale off-screen frame (e.g. the user resized the
+        // panel on an external display, disconnected it, and now the saved
+        // frame intersects no live screen). Recentre rather than leaving the
+        // panel invisible.
+        if let panel,
+           !NSScreen.screens.contains(where: { $0.frame.intersects(panel.frame) }) {
+            panel.center()
+        }
         // Activating the app lets the panel take key status so SwiftUI's
         // `onKeyPress(.escape)` fires on the first Esc press.
         NSApp.activate(ignoringOtherApps: true)
@@ -55,16 +63,25 @@ final class TranslationOverlayWindow {
         let hosting = NSHostingController(rootView: view)
 
         let p = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 420, height: 200),
-            // No `.utilityWindow` — that style mask gives a slim title bar
-            // with miniature traffic-light buttons. Standard panel chrome
-            // here so the close/minimize/zoom controls match the rest of
-            // macOS at normal size.
-            styleMask: [.titled, .closable, .nonactivatingPanel],
+            contentRect: NSRect(x: 0, y: 0, width: 720, height: 360),
+            // `.resizable` lets the user drag the corner to fit longer
+            // translations — without it the panel was stuck at the initial
+            // size and forced scrolling on 4+ line results. No
+            // `.utilityWindow` because that gives miniature traffic-light
+            // buttons; standard panel chrome reads as a normal macOS window.
+            styleMask: [.titled, .closable, .resizable, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
         p.contentViewController = hosting
+        // Assigning `contentViewController` makes the panel auto-fit the
+        // SwiftUI view's intrinsic content size, which overrides the
+        // `contentRect` we passed to the initializer. Force the size back
+        // explicitly so the FIRST present opens at the configured default.
+        // Subsequent presents reuse whatever size the user dragged the panel
+        // to last — that "sticky" behaviour is deliberate (translation-tool
+        // muscle memory) rather than re-applying the default each show.
+        p.setContentSize(NSSize(width: 720, height: 360))
         p.title = "Quick Translate"
         p.level = .floating
         p.isFloatingPanel = true
@@ -72,6 +89,12 @@ final class TranslationOverlayWindow {
         p.becomesKeyOnlyIfNeeded = false
         p.collectionBehavior = [.canJoinAllSpaces, .stationary]
         p.isReleasedWhenClosed = false
+        // Prevents macOS from restoring a smaller saved size between runs.
+        p.isRestorable = false
+        // Floor on resize so the user can't accidentally drag the panel
+        // into uselessness. No `maxSize` — long technical translations may
+        // legitimately want a large panel.
+        p.minSize = NSSize(width: 380, height: 220)
         // No `appearance` override — the panel inherits the system effective
         // appearance, so it auto-tracks light/dark mode like the menubar
         // popover does.

@@ -26,7 +26,15 @@ struct TranslationOverlayView: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 18)
-        .frame(width: 420)
+        // Flexible frame so the SwiftUI content stretches with the window
+        // when the user drags the panel corner. `idealWidth` / `idealHeight`
+        // is what the panel opens to; the min keeps the layout sane if the
+        // user drags it tiny.
+        .frame(
+            minWidth: 380, idealWidth: 720, maxWidth: .infinity,
+            minHeight: 220, idealHeight: 360, maxHeight: .infinity,
+            alignment: .topLeading
+        )
         .onKeyPress(.escape) {
             onClose()
             return .handled
@@ -49,9 +57,12 @@ struct TranslationOverlayView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        // `minHeight` keeps the panel's text area from collapsing for very
-        // short translations.
-        .frame(minHeight: 60, maxHeight: 280)
+        // ScrollView fills whatever vertical space the panel gives it. For
+        // medium translations the text fits without scrolling; for very long
+        // ones the user drags the panel taller and gets more visible at
+        // once. `.infinity` removes the artificial cap that used to force
+        // scrolling on 4+ line translations.
+        .frame(minHeight: 80, maxHeight: .infinity)
     }
 
     private func footerRow(target: Language, detected: String?) -> some View {
